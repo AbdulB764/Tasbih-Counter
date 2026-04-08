@@ -1,0 +1,514 @@
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-sans); }
+
+  .tasbih-wrap {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1.5rem 1rem 2rem;
+    gap: 1.5rem;
+  }
+
+  .top-bar {
+    width: 100%;
+    max-width: 420px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .title-block h1 {
+    font-size: 22px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    letter-spacing: 0.01em;
+  }
+  .title-block p {
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    margin-top: 2px;
+  }
+
+  .settings-btn {
+    background: var(--color-background-secondary);
+    border: 0.5px solid var(--color-border-tertiary);
+    border-radius: var(--border-radius-md);
+    padding: 7px 14px;
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .settings-btn:hover { background: var(--color-background-tertiary); }
+
+  .dhikr-selector {
+    width: 100%;
+    max-width: 420px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .dhikr-btn {
+    flex: 1;
+    min-width: 90px;
+    background: var(--color-background-secondary);
+    border: 0.5px solid var(--color-border-tertiary);
+    border-radius: var(--border-radius-md);
+    padding: 8px 10px;
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s;
+  }
+  .dhikr-btn.active {
+    background: #1D9E75;
+    border-color: #0F6E56;
+    color: #fff;
+  }
+
+  .counter-card {
+    width: 100%;
+    max-width: 420px;
+    background: var(--color-background-primary);
+    border: 0.5px solid var(--color-border-tertiary);
+    border-radius: var(--border-radius-lg);
+    padding: 2rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .progress-ring-wrap {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .progress-ring-wrap svg {
+    position: absolute;
+    top: 0; left: 0;
+    transform: rotate(-90deg);
+  }
+  .ring-bg { fill: none; stroke: var(--color-border-tertiary); stroke-width: 6; }
+  .ring-fill {
+    fill: none;
+    stroke: #1D9E75;
+    stroke-width: 6;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.3s ease, stroke 0.3s;
+  }
+  .ring-fill.complete { stroke: #E24B4A; }
+
+  .count-display {
+    text-align: center;
+  }
+  .count-num {
+    font-size: 52px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    line-height: 1;
+    transition: color 0.2s;
+  }
+  .count-num.pulse {
+    animation: pulse 0.15s ease;
+  }
+  .count-limit {
+    font-size: 14px;
+    color: var(--color-text-secondary);
+    margin-top: 4px;
+  }
+  .count-total {
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+    margin-top: 2px;
+  }
+
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.08); }
+    100% { transform: scale(1); }
+  }
+
+  .tap-btn {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: #1D9E75;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.1s, background 0.2s;
+    box-shadow: none;
+  }
+  .tap-btn:active { transform: scale(0.93); }
+  .tap-btn.complete { background: #E24B4A; }
+  .tap-btn svg { width: 40px; height: 40px; }
+
+  .tap-hint {
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+  }
+
+  .stats-row {
+    width: 100%;
+    max-width: 420px;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+  }
+  .stat-card {
+    background: var(--color-background-secondary);
+    border-radius: var(--border-radius-md);
+    padding: 12px 10px;
+    text-align: center;
+  }
+  .stat-label {
+    font-size: 11px;
+    color: var(--color-text-secondary);
+    margin-bottom: 4px;
+  }
+  .stat-val {
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+  }
+
+  .action-row {
+    width: 100%;
+    max-width: 420px;
+    display: flex;
+    gap: 8px;
+  }
+  .action-btn {
+    flex: 1;
+    padding: 10px;
+    border-radius: var(--border-radius-md);
+    border: 0.5px solid var(--color-border-secondary);
+    background: transparent;
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .action-btn:hover { background: var(--color-background-secondary); }
+  .action-btn.danger { color: #A32D2D; border-color: #F7C1C1; }
+  .action-btn.danger:hover { background: #FCEBEB; }
+
+  .settings-panel {
+    width: 100%;
+    max-width: 420px;
+    background: var(--color-background-primary);
+    border: 0.5px solid var(--color-border-tertiary);
+    border-radius: var(--border-radius-lg);
+    padding: 1.25rem;
+    display: none;
+    gap: 1rem;
+    flex-direction: column;
+  }
+  .settings-panel.open { display: flex; }
+  .settings-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  .settings-label {
+    font-size: 14px;
+    color: var(--color-text-primary);
+  }
+  .settings-sub {
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    margin-top: 1px;
+  }
+  .limit-input {
+    width: 90px;
+    padding: 6px 10px;
+    font-size: 14px;
+    border: 0.5px solid var(--color-border-secondary);
+    border-radius: var(--border-radius-md);
+    background: var(--color-background-secondary);
+    color: var(--color-text-primary);
+    text-align: center;
+  }
+  .toggle {
+    position: relative;
+    width: 40px;
+    height: 22px;
+    cursor: pointer;
+  }
+  .toggle input { opacity: 0; width: 0; height: 0; }
+  .toggle-slider {
+    position: absolute;
+    inset: 0;
+    background: var(--color-border-tertiary);
+    border-radius: 11px;
+    transition: 0.2s;
+  }
+  .toggle-slider:before {
+    content: '';
+    position: absolute;
+    width: 16px; height: 16px;
+    left: 3px; bottom: 3px;
+    background: white;
+    border-radius: 50%;
+    transition: 0.2s;
+  }
+  .toggle input:checked + .toggle-slider { background: #1D9E75; }
+  .toggle input:checked + .toggle-slider:before { transform: translateX(18px); }
+
+  .complete-banner {
+    display: none;
+    width: 100%;
+    max-width: 420px;
+    background: #EAF3DE;
+    border: 0.5px solid #639922;
+    border-radius: var(--border-radius-md);
+    padding: 12px 16px;
+    text-align: center;
+    font-size: 14px;
+    color: #3B6D11;
+    font-weight: 500;
+  }
+  .complete-banner.show { display: block; }
+</style>
+
+<h2 class="sr-only">Tasbih digital counter — tap to count, set a limit and receive a vibration alert when reached.</h2>
+
+<div class="tasbih-wrap">
+
+  <div class="top-bar">
+    <div class="title-block">
+      <h1>Tasbih</h1>
+      <p>Digital dhikr counter</p>
+    </div>
+    <button class="settings-btn" id="settingsToggle">Settings</button>
+  </div>
+
+  <div class="settings-panel" id="settingsPanel">
+    <div class="settings-row">
+      <div>
+        <div class="settings-label">Count limit</div>
+        <div class="settings-sub">Stop and alert at this number</div>
+      </div>
+      <input class="limit-input" type="number" id="limitInput" min="1" max="9999" value="33">
+    </div>
+    <div class="settings-row">
+      <div>
+        <div class="settings-label">Vibration alert</div>
+        <div class="settings-sub">Vibrate when limit is reached</div>
+      </div>
+      <label class="toggle">
+        <input type="checkbox" id="vibrateToggle" checked>
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+    <div class="settings-row">
+      <div>
+        <div class="settings-label">Vibrate every count</div>
+        <div class="settings-sub">Subtle pulse on each tap</div>
+      </div>
+      <label class="toggle">
+        <input type="checkbox" id="vibrateEvery">
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+    <div class="settings-row">
+      <div>
+        <div class="settings-label">Auto-reset on complete</div>
+        <div class="settings-sub">Restart after reaching limit</div>
+      </div>
+      <label class="toggle">
+        <input type="checkbox" id="autoResetToggle">
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+  </div>
+
+  <div class="dhikr-selector">
+    <button class="dhikr-btn active" data-limit="33">SubhanAllah<br><span style="font-size:11px;opacity:0.7">× 33</span></button>
+    <button class="dhikr-btn" data-limit="33">Alhamdulillah<br><span style="font-size:11px;opacity:0.7">× 33</span></button>
+    <button class="dhikr-btn" data-limit="34">Allahu Akbar<br><span style="font-size:11px;opacity:0.7">× 34</span></button>
+    <button class="dhikr-btn" data-limit="100">Istighfar<br><span style="font-size:11px;opacity:0.7">× 100</span></button>
+  </div>
+
+  <div class="complete-banner" id="completeBanner">
+    Alhamdulillah! Round complete.
+  </div>
+
+  <div class="counter-card">
+    <div class="progress-ring-wrap">
+      <svg width="200" height="200" viewBox="0 0 200 200">
+        <circle class="ring-bg" cx="100" cy="100" r="88"/>
+        <circle class="ring-fill" id="ringFill" cx="100" cy="100" r="88"
+          stroke-dasharray="553"
+          stroke-dashoffset="553"/>
+      </svg>
+      <div class="count-display">
+        <div class="count-num" id="countNum">0</div>
+        <div class="count-limit" id="countLimit">of 33</div>
+        <div class="count-total" id="countTotal">Total: 0</div>
+      </div>
+    </div>
+
+    <button class="tap-btn" id="tapBtn" aria-label="Count">
+      <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M20 8v24M8 20h24" stroke="white" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+    </button>
+    <div class="tap-hint">Tap or press Space / Enter</div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-label">Rounds</div>
+      <div class="stat-val" id="statRounds">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Total</div>
+      <div class="stat-val" id="statTotal">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Remaining</div>
+      <div class="stat-val" id="statRemain">33</div>
+    </div>
+  </div>
+
+  <div class="action-row">
+    <button class="action-btn" id="undoBtn">Undo</button>
+    <button class="action-btn danger" id="resetBtn">Reset all</button>
+  </div>
+
+</div>
+
+<script>
+  let count = 0;
+  let total = 0;
+  let rounds = 0;
+  let limit = 33;
+  const CIRCUMFERENCE = 2 * Math.PI * 88;
+
+  const countNum = document.getElementById('countNum');
+  const countLimit = document.getElementById('countLimit');
+  const countTotal = document.getElementById('countTotal');
+  const ringFill = document.getElementById('ringFill');
+  const tapBtn = document.getElementById('tapBtn');
+  const statRounds = document.getElementById('statRounds');
+  const statTotal = document.getElementById('statTotal');
+  const statRemain = document.getElementById('statRemain');
+  const limitInput = document.getElementById('limitInput');
+  const vibrateToggle = document.getElementById('vibrateToggle');
+  const vibrateEvery = document.getElementById('vibrateEvery');
+  const autoResetToggle = document.getElementById('autoResetToggle');
+  const completeBanner = document.getElementById('completeBanner');
+
+  function vibrate(pattern) {
+    if (navigator.vibrate) navigator.vibrate(pattern);
+  }
+
+  function updateUI() {
+    countNum.textContent = count;
+    countLimit.textContent = 'of ' + limit;
+    countTotal.textContent = 'Total: ' + total;
+    statRounds.textContent = rounds;
+    statTotal.textContent = total;
+    statRemain.textContent = Math.max(0, limit - count);
+
+    const progress = Math.min(count / limit, 1);
+    const offset = CIRCUMFERENCE * (1 - progress);
+    ringFill.style.strokeDashoffset = offset;
+
+    if (count >= limit) {
+      ringFill.classList.add('complete');
+      tapBtn.classList.add('complete');
+    } else {
+      ringFill.classList.remove('complete');
+      tapBtn.classList.remove('complete');
+      completeBanner.classList.remove('show');
+    }
+  }
+
+  function tap() {
+    if (count >= limit) return;
+
+    count++;
+    total++;
+
+    countNum.classList.remove('pulse');
+    void countNum.offsetWidth;
+    countNum.classList.add('pulse');
+
+    if (vibrateEvery.checked) vibrate(10);
+
+    if (count >= limit) {
+      rounds++;
+      completeBanner.classList.add('show');
+      completeBanner.textContent = 'Alhamdulillah! Round ' + rounds + ' complete.';
+
+      if (vibrateToggle.checked) {
+        vibrate([100, 60, 100, 60, 300]);
+      }
+
+      if (autoResetToggle.checked) {
+        setTimeout(() => {
+          count = 0;
+          completeBanner.classList.remove('show');
+          updateUI();
+        }, 1500);
+      }
+    }
+
+    updateUI();
+  }
+
+  tapBtn.addEventListener('click', tap);
+  tapBtn.addEventListener('touchend', (e) => { e.preventDefault(); tap(); });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.code === 'Space' || e.code === 'Enter') { e.preventDefault(); tap(); }
+  });
+
+  document.getElementById('undoBtn').addEventListener('click', () => {
+    if (count > 0) { count--; total = Math.max(0, total - 1); }
+    completeBanner.classList.remove('show');
+    updateUI();
+  });
+
+  document.getElementById('resetBtn').addEventListener('click', () => {
+    count = 0; total = 0; rounds = 0;
+    completeBanner.classList.remove('show');
+    updateUI();
+  });
+
+  limitInput.addEventListener('change', () => {
+    const val = parseInt(limitInput.value);
+    if (val > 0) { limit = val; count = 0; updateUI(); }
+  });
+
+  document.getElementById('settingsToggle').addEventListener('click', () => {
+    document.getElementById('settingsPanel').classList.toggle('open');
+  });
+
+  document.querySelectorAll('.dhikr-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.dhikr-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      limit = parseInt(btn.dataset.limit);
+      limitInput.value = limit;
+      count = 0;
+      completeBanner.classList.remove('show');
+      updateUI();
+    });
+  });
+
+  updateUI();
+</script>
